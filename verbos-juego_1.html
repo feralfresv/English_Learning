@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verbos IQ — práctica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Karla:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2A31; --ink2:#123A44; --ink3:#1B4C58;
+  --bone:#F6F1E4; --bone-dim:#CBBFA8;
+  --amber:#F2B441; --mint:#5FD3A8; --rose:#FF6B6B; --slate:#82A5B0;
+  --disp:'Fraunces',Georgia,serif;
+  --body:'Karla',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; background:var(--ink); color:var(--bone);
+  font-family:var(--body); display:flex; justify-content:center;
+  padding:20px 16px 40px;
+  background-image:radial-gradient(circle at 20% -10%, #17505c 0%, transparent 55%);
+}
+.wrap{width:100%; max-width:660px}
+
+header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:20px}
+h1{font-family:var(--disp); font-weight:900; font-size:26px; margin:0; letter-spacing:-.02em}
+h1 em{font-style:normal; color:var(--amber)}
+.meta{font-family:var(--mono); font-size:11px; color:var(--slate); text-align:right; line-height:1.5}
+
+.bar{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap}
+.chip{
+  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  background:var(--ink2); border:1px solid var(--ink3); color:var(--slate);
+  padding:6px 10px; border-radius:99px;
+}
+.chip b{color:var(--bone); font-weight:700}
+.chip.hot b{color:var(--amber)}
+.chip.tog{cursor:pointer; font-family:var(--mono)}
+.chip.tog:hover{border-color:var(--slate)}
+.chip.tog.off{opacity:.45}
+.spk{
+  background:#E7E0CD; border:1px solid #D5CCB6; border-radius:9px; padding:7px 9px;
+  display:inline-flex; align-items:center; color:var(--ink); line-height:0;
+}
+.spk:hover{background:var(--ink); color:var(--bone)}
+.spk svg{width:17px; height:17px}
+.cell{cursor:pointer}
+.cell:hover{background:#F1EADA}
+.cell.target:hover{background:#E3F2E9}
+.hint{font-family:var(--mono); font-size:10px; color:#93A399; margin-top:8px; text-align:right}
+
+.card{
+  background:var(--bone); color:var(--ink); border-radius:18px; padding:24px 22px 22px;
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.65);
+}
+.ask{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#6C7F73; margin-bottom:14px}
+.ask s{text-decoration:none; color:var(--ink); font-weight:700}
+
+.prompt{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px}
+.word{font-family:var(--disp); font-weight:900; font-size:44px; line-height:1; letter-spacing:-.03em}
+.badge{font-family:var(--mono); font-size:10px; font-weight:700; padding:4px 8px; border-radius:6px; letter-spacing:.08em}
+.badge.I{background:var(--amber); color:#3A2A00}
+.badge.R{background:#D8D0BC; color:#4A4638}
+.es{font-family:var(--disp); font-style:italic; font-size:18px; color:#6C7F73; margin-bottom:20px}
+
+input[type=text]{
+  width:100%; font-family:var(--mono); font-size:22px; padding:13px 14px;
+  border:2px solid #D5CCB6; border-radius:11px; background:#FFFDF7; color:var(--ink);
+  outline:none;
+}
+input[type=text]:focus{border-color:var(--ink)}
+.choices{display:flex; gap:8px; flex-wrap:wrap}
+button{font-family:var(--body); cursor:pointer; border:none}
+.opt{
+  flex:1 1 30%; min-width:88px; font-family:var(--mono); font-size:17px; font-weight:700;
+  padding:14px 8px; border-radius:11px; background:#FFFDF7; border:2px solid #D5CCB6; color:var(--ink);
+}
+.opt:hover{border-color:var(--ink)}
+.go{
+  margin-top:12px; width:100%; padding:13px; border-radius:11px; background:var(--ink);
+  color:var(--bone); font-size:15px; font-weight:800; letter-spacing:.02em;
+}
+.go:hover{background:var(--ink3)}
+
+.row{margin-top:20px; border-top:1px solid #DDD5C0; padding-top:14px; display:none}
+.row.show{display:block}
+.grid{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:#DDD5C0; border:1px solid #DDD5C0; border-radius:8px; overflow:hidden}
+.cell{background:#FFFDF7; padding:8px 5px; min-height:52px; display:flex; flex-direction:column; justify-content:center; gap:3px}
+.cell span{font-family:var(--mono); font-size:8px; letter-spacing:.06em; text-transform:uppercase; color:#93A399}
+.cell b{font-family:var(--mono); font-size:12px; font-weight:700; word-break:break-word; line-height:1.25}
+.cell.target{background:#EEF7F1}
+.cell.target.bad{background:#FFEDED}
+.verdict{margin-top:12px; font-size:15px; line-height:1.5}
+.verdict .ok{color:#0F7A54; font-weight:800}
+.verdict .no{color:#C0392B; font-weight:800}
+.verdict .fix{font-family:var(--mono); font-weight:700}
+.note{margin-top:8px; font-size:13px; color:#8A5A2B; background:#FDF3E0; padding:8px 10px; border-radius:8px}
+
+.map{margin-top:22px}
+.map h2{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--slate); font-weight:400; margin:0 0 10px}
+.tiles{display:grid; grid-template-columns:repeat(auto-fill,minmax(11px,1fr)); gap:3px}
+.t{aspect-ratio:1; border-radius:2px; background:#1B4049}
+.t.b1{background:#8A3D3D}.t.b2{background:#A9702F}.t.b3{background:#8C8A34}
+.t.b4{background:#4A8A62}.t.b5{background:var(--mint)}
+.legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; font-family:var(--mono); font-size:10px; color:var(--slate)}
+.legend i{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px}
+
+footer{margin-top:24px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+.link{background:none; color:var(--slate); font-size:12px; text-decoration:underline; padding:0}
+.link:hover{color:var(--bone)}
+.warn{font-family:var(--mono); font-size:10px; color:var(--amber)}
+@media (max-width:480px){
+  .word{font-size:34px}
+  .cell b{font-size:10px}
+  .cell{min-height:46px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Verbos <em>IQ</em></h1>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div class="bar">
+    <div class="chip">sesión <b id="s-tot">0</b></div>
+    <div class="chip">aciertos <b id="s-ok">0</b></div>
+    <div class="chip hot">racha <b id="s-streak">0</b></div>
+    <div class="chip">dominados <b id="s-dom">0</b>/201</div>
+    <button class="chip tog" id="snd">&#9835; sonido <b>on</b></button>
+  </div>
+
+  <div class="card">
+    <div class="ask" id="ask"></div>
+    <div class="prompt">
+      <div class="word" id="word"></div>
+      <button class="spk" id="spk" title="Escuchar (S)" aria-label="Escuchar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon>
+          <path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+        </svg>
+      </button>
+      <div class="badge" id="badge"></div>
+    </div>
+    <div class="es" id="es"></div>
+
+    <div id="answerArea"></div>
+
+    <div class="row" id="row">
+      <div class="grid" id="grid"></div>
+      <div class="verdict" id="verdict"></div>
+      <div class="note" id="note" style="display:none"></div>
+      <div class="hint">toca cualquier celda para escucharla</div>
+      <button class="go" id="next">Siguiente</button>
+    </div>
+  </div>
+
+  <div class="map">
+    <h2>Tu mapa — 201 verbos</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="legend">
+      <span><i style="background:#1B4049"></i>sin ver</span>
+      <span><i style="background:#8A3D3D"></i>falla</span>
+      <span><i style="background:#A9702F"></i>flojo</span>
+      <span><i style="background:#8C8A34"></i>va</span>
+      <span><i style="background:#4A8A62"></i>casi</span>
+      <span><i style="background:#5FD3A8"></i>dominado</span>
+    </div>
+  </div>
+
+  <footer>
+    <button class="link" id="reset">Borrar mi progreso</button>
+    <span class="warn" id="warn"></span>
+  </footer>
+</div>
+
+<script>
+const VERBOS = [{"base": "add", "third": "adds", "past": "added", "part": "added", "ing": "adding", "ri": "R", "ed": "/id/", "nota": "", "es": "agregar"}, {"base": "admit", "third": "admits", "past": "admitted", "part": "admitted", "ing": "admitting", "ri": "R", "ed": "/id/", "nota": "", "es": "admitir"}, {"base": "agree", "third": "agrees", "past": "agreed", "part": "agreed", "ing": "agreeing", "ri": "R", "ed": "/d/", "nota": "-ing: agreeing, doble e", "es": "estar de acuerdo"}, {"base": "allow", "third": "allows", "past": "allowed", "part": "allowed", "ing": "allowing", "ri": "R", "ed": "/d/", "nota": "w muda: /a-láu/", "es": "permitir"}, {"base": "amaze", "third": "amazes", "past": "amazed", "part": "amazed", "ing": "amazing", "ri": "R", "ed": "/d/", "nota": "", "es": "asombrar"}, {"base": "annoy", "third": "annoys", "past": "annoyed", "part": "annoyed", "ing": "annoying", "ri": "R", "ed": "/d/", "nota": "", "es": "molestar"}, {"base": "answer", "third": "answers", "past": "answered", "part": "answered", "ing": "answering", "ri": "R", "ed": "/d/", "nota": "w muda: /an-ser/", "es": "contestar"}, {"base": "arrive", "third": "arrives", "past": "arrived", "part": "arrived", "ing": "arriving", "ri": "R", "ed": "/d/", "nota": "", "es": "llegar"}, {"base": "ask", "third": "asks", "past": "asked", "part": "asked", "ing": "asking", "ri": "R", "ed": "/t/", "nota": "", "es": "preguntar"}, {"base": "bake", "third": "bakes", "past": "baked", "part": "baked", "ing": "baking", "ri": "R", "ed": "/t/", "nota": "", "es": "hornear"}, {"base": "be", "third": "is", "past": "was / were", "part": "been", "ing": "being", "ri": "I", "ed": "", "nota": "was /uos/ - were /uer/", "es": "ser / estar"}, {"base": "become", "third": "becomes", "past": "became", "part": "become", "ing": "becoming", "ri": "I", "ed": "", "nota": "participio = base", "es": "convertirse en"}, {"base": "begin", "third": "begins", "past": "began", "part": "begun", "ing": "beginning", "ri": "I", "ed": "", "nota": "3 formas distintas", "es": "comenzar"}, {"base": "believe", "third": "believes", "past": "believed", "part": "believed", "ing": "believing", "ri": "R", "ed": "/d/", "nota": "", "es": "creer"}, {"base": "borrow", "third": "borrows", "past": "borrowed", "part": "borrowed", "ing": "borrowing", "ri": "R", "ed": "/d/", "nota": "yo recibo lo prestado", "es": "pedir prestado"}, {"base": "box", "third": "boxes", "past": "boxed", "part": "boxed", "ing": "boxing", "ri": "R", "ed": "/t/", "nota": "", "es": "boxear"}, {"base": "break", "third": "breaks", "past": "broke", "part": "broken", "ing": "breaking", "ri": "I", "ed": "", "nota": "broke /brouk/", "es": "romper"}, {"base": "breathe", "third": "breathes", "past": "breathed", "part": "breathed", "ing": "breathing", "ri": "R", "ed": "/t/", "nota": "e final muda: /briid/", "es": "respirar"}, {"base": "bring", "third": "brings", "past": "brought", "part": "brought", "ing": "bringing", "ri": "I", "ed": "", "nota": "gh muda: /brot/", "es": "traer"}, {"base": "brush", "third": "brushes", "past": "brushed", "part": "brushed", "ing": "brushing", "ri": "R", "ed": "/t/", "nota": "", "es": "cepillar"}, {"base": "build", "third": "builds", "past": "built", "part": "built", "ing": "building", "ri": "I", "ed": "", "nota": "ui suena i: /bild/", "es": "construir"}, {"base": "burn", "third": "burns", "past": "burned", "part": "burned", "ing": "burning", "ri": "R", "ed": "/d/", "nota": "UK: burnt", "es": "quemar"}, {"base": "buy", "third": "buys", "past": "bought", "part": "bought", "ing": "buying", "ri": "I", "ed": "", "nota": "gh muda: /bot/", "es": "comprar"}, {"base": "buzz", "third": "buzzes", "past": "buzzed", "part": "buzzed", "ing": "buzzing", "ri": "R", "ed": "/d/", "nota": "", "es": "zumbar"}, {"base": "call", "third": "calls", "past": "called", "part": "called", "ing": "calling", "ri": "R", "ed": "/d/", "nota": "", "es": "llamar"}, {"base": "can", "third": "can", "past": "could", "part": "--", "ing": "--", "ri": "I", "ed": "", "nota": "could: l muda /kud/", "es": "poder"}, {"base": "cancel", "third": "cancels", "past": "canceled", "part": "canceled", "ing": "canceling", "ri": "R", "ed": "/d/", "nota": "", "es": "cancelar"}, {"base": "carry", "third": "carries", "past": "carried", "part": "carried", "ing": "carrying", "ri": "R", "ed": "/d/", "nota": "", "es": "cargar / llevar"}, {"base": "catch", "third": "catches", "past": "caught", "part": "caught", "ing": "catching", "ri": "I", "ed": "", "nota": "gh muda: /kot/", "es": "atrapar"}, {"base": "change", "third": "changes", "past": "changed", "part": "changed", "ing": "changing", "ri": "R", "ed": "/d/", "nota": "", "es": "cambiar"}, {"base": "check", "third": "checks", "past": "checked", "part": "checked", "ing": "checking", "ri": "R", "ed": "/t/", "nota": "", "es": "revisar"}, {"base": "choose", "third": "chooses", "past": "chose", "part": "chosen", "ing": "choosing", "ri": "I", "ed": "", "nota": "chose /chous/", "es": "elegir"}, {"base": "clean", "third": "cleans", "past": "cleaned", "part": "cleaned", "ing": "cleaning", "ri": "R", "ed": "/d/", "nota": "i larga: /kliin/", "es": "limpiar"}, {"base": "close", "third": "closes", "past": "closed", "part": "closed", "ing": "closing", "ri": "R", "ed": "/d/", "nota": "suena /klouz/", "es": "cerrar"}, {"base": "comb", "third": "combs", "past": "combed", "part": "combed", "ing": "combing", "ri": "R", "ed": "/d/", "nota": "b muda: /koum/", "es": "peinar"}, {"base": "come", "third": "comes", "past": "came", "part": "come", "ing": "coming", "ri": "I", "ed": "", "nota": "participio = base", "es": "venir"}, {"base": "commit", "third": "commits", "past": "committed", "part": "committed", "ing": "committing", "ri": "R", "ed": "/id/", "nota": "", "es": "comprometerse"}, {"base": "compare", "third": "compares", "past": "compared", "part": "compared", "ing": "comparing", "ri": "R", "ed": "/d/", "nota": "", "es": "comparar"}, {"base": "continue", "third": "continues", "past": "continued", "part": "continued", "ing": "continuing", "ri": "R", "ed": "/d/", "nota": "", "es": "continuar"}, {"base": "cook", "third": "cooks", "past": "cooked", "part": "cooked", "ing": "cooking", "ri": "R", "ed": "/t/", "nota": "u corta: /kuk/", "es": "cocinar"}, {"base": "cost", "third": "costs", "past": "cost", "part": "cost", "ing": "costing", "ri": "I", "ed": "", "nota": "las 3 formas iguales", "es": "costar"}, {"base": "create", "third": "creates", "past": "created", "part": "created", "ing": "creating", "ri": "R", "ed": "/id/", "nota": "", "es": "crear"}, {"base": "cross", "third": "crosses", "past": "crossed", "part": "crossed", "ing": "crossing", "ri": "R", "ed": "/t/", "nota": "", "es": "cruzar"}, {"base": "cry", "third": "cries", "past": "cried", "part": "cried", "ing": "crying", "ri": "R", "ed": "/d/", "nota": "", "es": "llorar"}, {"base": "cut", "third": "cuts", "past": "cut", "part": "cut", "ing": "cutting", "ri": "I", "ed": "", "nota": "las 3 formas iguales", "es": "cortar"}, {"base": "damage", "third": "damages", "past": "damaged", "part": "damaged", "ing": "damaging", "ri": "R", "ed": "/d/", "nota": "", "es": "dañar"}, {"base": "dance", "third": "dances", "past": "danced", "part": "danced", "ing": "dancing", "ri": "R", "ed": "/t/", "nota": "", "es": "bailar"}, {"base": "decide", "third": "decides", "past": "decided", "part": "decided", "ing": "deciding", "ri": "R", "ed": "/id/", "nota": "", "es": "decidir"}, {"base": "decorate", "third": "decorates", "past": "decorated", "part": "decorated", "ing": "decorating", "ri": "R", "ed": "/id/", "nota": "", "es": "decorar"}, {"base": "die", "third": "dies", "past": "died", "part": "died", "ing": "dying", "ri": "R", "ed": "/d/", "nota": "-ing: dying, no 'dieing'", "es": "morir"}, {"base": "discuss", "third": "discusses", "past": "discussed", "part": "discussed", "ing": "discussing", "ri": "R", "ed": "/t/", "nota": "", "es": "discutir / hablar de"}, {"base": "dive", "third": "dives", "past": "dived", "part": "dived", "ing": "diving", "ri": "R", "ed": "/d/", "nota": "UK: dove", "es": "clavarse / sumergirse"}, {"base": "do", "third": "does", "past": "did", "part": "done", "ing": "doing", "ri": "I", "ed": "", "nota": "does /das/ - done /dan/", "es": "hacer"}, {"base": "draw", "third": "draws", "past": "drew", "part": "drawn", "ing": "drawing", "ri": "I", "ed": "", "nota": "drew /dru/ - drawn /dron/", "es": "dibujar"}, {"base": "dress", "third": "dresses", "past": "dressed", "part": "dressed", "ing": "dressing", "ri": "R", "ed": "/t/", "nota": "", "es": "vestir"}, {"base": "drink", "third": "drinks", "past": "drank", "part": "drunk", "ing": "drinking", "ri": "I", "ed": "", "nota": "drunk /drank/", "es": "tomar / beber"}, {"base": "drive", "third": "drives", "past": "drove", "part": "driven", "ing": "driving", "ri": "I", "ed": "", "nota": "driven: i corta /dríven/", "es": "conducir"}, {"base": "eat", "third": "eats", "past": "ate", "part": "eaten", "ing": "eating", "ri": "I", "ed": "", "nota": "i larga: /iit/", "es": "comer"}, {"base": "enjoy", "third": "enjoys", "past": "enjoyed", "part": "enjoyed", "ing": "enjoying", "ri": "R", "ed": "/d/", "nota": "", "es": "disfrutar"}, {"base": "enroll", "third": "enrolls", "past": "enrolled", "part": "enrolled", "ing": "enrolling", "ri": "R", "ed": "/d/", "nota": "", "es": "inscribirse"}, {"base": "exercise", "third": "exercises", "past": "exercised", "part": "exercised", "ing": "exercising", "ri": "R", "ed": "/d/", "nota": "/ek-ser-saiz/", "es": "ejercitar"}, {"base": "feed", "third": "feeds", "past": "fed", "part": "fed", "ing": "feeding", "ri": "I", "ed": "", "nota": "fed: i corta /fed/", "es": "alimentar"}, {"base": "feel", "third": "feels", "past": "felt", "part": "felt", "ing": "feeling", "ri": "I", "ed": "", "nota": "felt /felt/", "es": "sentir"}, {"base": "fight", "third": "fights", "past": "fought", "part": "fought", "ing": "fighting", "ri": "I", "ed": "", "nota": "gh muda: /fait/ - /fot/", "es": "pelear"}, {"base": "fill", "third": "fills", "past": "filled", "part": "filled", "ing": "filling", "ri": "R", "ed": "/d/", "nota": "", "es": "llenar"}, {"base": "find", "third": "finds", "past": "found", "part": "found", "ing": "finding", "ri": "I", "ed": "", "nota": "found /faund/", "es": "encontrar"}, {"base": "finish", "third": "finishes", "past": "finished", "part": "finished", "ing": "finishing", "ri": "R", "ed": "/t/", "nota": "", "es": "terminar"}, {"base": "fix", "third": "fixes", "past": "fixed", "part": "fixed", "ing": "fixing", "ri": "R", "ed": "/t/", "nota": "", "es": "reparar"}, {"base": "fly", "third": "flies", "past": "flew", "part": "flown", "ing": "flying", "ri": "I", "ed": "", "nota": "flew /flu/, flown /floun/", "es": "volar"}, {"base": "fold", "third": "folds", "past": "folded", "part": "folded", "ing": "folding", "ri": "R", "ed": "/id/", "nota": "", "es": "doblar"}, {"base": "follow", "third": "follows", "past": "followed", "part": "followed", "ing": "following", "ri": "R", "ed": "/d/", "nota": "w muda: /fá-lou/", "es": "seguir"}, {"base": "forget", "third": "forgets", "past": "forgot", "part": "forgotten", "ing": "forgetting", "ri": "I", "ed": "", "nota": "", "es": "olvidar"}, {"base": "fry", "third": "fries", "past": "fried", "part": "fried", "ing": "frying", "ri": "R", "ed": "/d/", "nota": "", "es": "freír"}, {"base": "get", "third": "gets", "past": "got", "part": "gotten", "ing": "getting", "ri": "I", "ed": "", "nota": "participio US: gotten", "es": "conseguir"}, {"base": "get dressed", "third": "gets dressed", "past": "got dressed", "part": "gotten dressed", "ing": "getting dressed", "ri": "I", "ed": "", "nota": "", "es": "vestirse"}, {"base": "get up", "third": "gets up", "past": "got up", "part": "gotten up", "ing": "getting up", "ri": "I", "ed": "", "nota": "", "es": "levantarse"}, {"base": "give", "third": "gives", "past": "gave", "part": "given", "ing": "giving", "ri": "I", "ed": "", "nota": "i corta: /guiv/", "es": "dar"}, {"base": "go", "third": "goes", "past": "went", "part": "gone", "ing": "going", "ri": "I", "ed": "", "nota": "goes /gous/ - gone /gon/", "es": "ir"}, {"base": "grow", "third": "grows", "past": "grew", "part": "grown", "ing": "growing", "ri": "I", "ed": "", "nota": "grew /gru/ - grown /groun/", "es": "crecer"}, {"base": "happen", "third": "happens", "past": "happened", "part": "happened", "ing": "happening", "ri": "R", "ed": "/d/", "nota": "", "es": "suceder / pasar"}, {"base": "hate", "third": "hates", "past": "hated", "part": "hated", "ing": "hating", "ri": "R", "ed": "/id/", "nota": "", "es": "odiar"}, {"base": "have", "third": "has", "past": "had", "part": "had", "ing": "having", "ri": "I", "ed": "", "nota": "has /jas/ - had /jad/", "es": "tener / haber"}, {"base": "hear", "third": "hears", "past": "heard", "part": "heard", "ing": "hearing", "ri": "I", "ed": "", "nota": "heard /jerd/, no /jird/", "es": "oír"}, {"base": "heat", "third": "heats", "past": "heated", "part": "heated", "ing": "heating", "ri": "R", "ed": "/id/", "nota": "", "es": "calentar"}, {"base": "help", "third": "helps", "past": "helped", "part": "helped", "ing": "helping", "ri": "R", "ed": "/t/", "nota": "", "es": "ayudar"}, {"base": "hide", "third": "hides", "past": "hid", "part": "hidden", "ing": "hiding", "ri": "I", "ed": "", "nota": "hid /jid/ - hidden i corta", "es": "esconder"}, {"base": "hit", "third": "hits", "past": "hit", "part": "hit", "ing": "hitting", "ri": "I", "ed": "", "nota": "las 3 formas iguales", "es": "golpear"}, {"base": "hold", "third": "holds", "past": "held", "part": "held", "ing": "holding", "ri": "I", "ed": "", "nota": "/jould/ - held /jeld/", "es": "sostener"}, {"base": "hurry", "third": "hurries", "past": "hurried", "part": "hurried", "ing": "hurrying", "ri": "R", "ed": "/d/", "nota": "", "es": "apurarse"}, {"base": "hurt", "third": "hurts", "past": "hurt", "part": "hurt", "ing": "hurting", "ri": "I", "ed": "", "nota": "las 3 iguales: /jert/", "es": "lastimar / doler"}, {"base": "include", "third": "includes", "past": "included", "part": "included", "ing": "including", "ri": "R", "ed": "/id/", "nota": "", "es": "incluir"}, {"base": "invite", "third": "invites", "past": "invited", "part": "invited", "ing": "inviting", "ri": "R", "ed": "/id/", "nota": "", "es": "invitar"}, {"base": "iron", "third": "irons", "past": "ironed", "part": "ironed", "ing": "ironing", "ri": "R", "ed": "/d/", "nota": "suena /ái-ern/", "es": "planchar"}, {"base": "keep", "third": "keeps", "past": "kept", "part": "kept", "ing": "keeping", "ri": "I", "ed": "", "nota": "kept /kept/", "es": "guardar"}, {"base": "kiss", "third": "kisses", "past": "kissed", "part": "kissed", "ing": "kissing", "ri": "R", "ed": "/t/", "nota": "", "es": "besar"}, {"base": "knock", "third": "knocks", "past": "knocked", "part": "knocked", "ing": "knocking", "ri": "R", "ed": "/t/", "nota": "k muda: /nok/", "es": "tocar la puerta"}, {"base": "know", "third": "knows", "past": "knew", "part": "known", "ing": "knowing", "ri": "I", "ed": "", "nota": "k muda: /nou/ - knew /nu/", "es": "saber / conocer"}, {"base": "laugh", "third": "laughs", "past": "laughed", "part": "laughed", "ing": "laughing", "ri": "R", "ed": "/t/", "nota": "gh suena f: /laf/", "es": "reír"}, {"base": "lead", "third": "leads", "past": "led", "part": "led", "ing": "leading", "ri": "I", "ed": "", "nota": "lead /liid/, pero led /led/", "es": "dirigir / guiar"}, {"base": "learn", "third": "learns", "past": "learned", "part": "learned", "ing": "learning", "ri": "R", "ed": "/d/", "nota": "UK: learnt", "es": "aprender"}, {"base": "leave", "third": "leaves", "past": "left", "part": "left", "ing": "leaving", "ri": "I", "ed": "", "nota": "left /left/", "es": "salir / dejar"}, {"base": "lend", "third": "lends", "past": "lent", "part": "lent", "ing": "lending", "ri": "I", "ed": "", "nota": "yo doy lo prestado", "es": "prestar"}, {"base": "let", "third": "lets", "past": "let", "part": "let", "ing": "letting", "ri": "I", "ed": "", "nota": "las 3 formas iguales", "es": "dejar / permitir"}, {"base": "lie", "third": "lies", "past": "lied", "part": "lied", "ing": "lying", "ri": "R", "ed": "/d/", "nota": "-ing: lying, no 'lieing'", "es": "mentir"}, {"base": "like", "third": "likes", "past": "liked", "part": "liked", "ing": "liking", "ri": "R", "ed": "/t/", "nota": "", "es": "gustar"}, {"base": "listen", "third": "listens", "past": "listened", "part": "listened", "ing": "listening", "ri": "R", "ed": "/d/", "nota": "t muda: /li-sen/", "es": "escuchar"}, {"base": "live", "third": "lives", "past": "lived", "part": "lived", "ing": "living", "ri": "R", "ed": "/d/", "nota": "i corta /liv/, no 'liiv'", "es": "vivir"}, {"base": "lock", "third": "locks", "past": "locked", "part": "locked", "ing": "locking", "ri": "R", "ed": "/t/", "nota": "", "es": "cerrar con llave"}, {"base": "look", "third": "looks", "past": "looked", "part": "looked", "ing": "looking", "ri": "R", "ed": "/t/", "nota": "u corta: /luk/", "es": "mirar / ver"}, {"base": "lose", "third": "loses", "past": "lost", "part": "lost", "ing": "losing", "ri": "I", "ed": "", "nota": "/luz/, no 'lous'", "es": "perder"}, {"base": "love", "third": "loves", "past": "loved", "part": "loved", "ing": "loving", "ri": "R", "ed": "/d/", "nota": "", "es": "amar"}, {"base": "make", "third": "makes", "past": "made", "part": "made", "ing": "making", "ri": "I", "ed": "", "nota": "made /meid/", "es": "hacer / fabricar"}, {"base": "marry", "third": "marries", "past": "married", "part": "married", "ing": "marrying", "ri": "R", "ed": "/d/", "nota": "", "es": "casarse"}, {"base": "meet", "third": "meets", "past": "met", "part": "met", "ing": "meeting", "ri": "I", "ed": "", "nota": "met: i corta /met/", "es": "conocer / reunirse"}, {"base": "miss", "third": "misses", "past": "missed", "part": "missed", "ing": "missing", "ri": "R", "ed": "/t/", "nota": "", "es": "extrañar / perder"}, {"base": "move", "third": "moves", "past": "moved", "part": "moved", "ing": "moving", "ri": "R", "ed": "/d/", "nota": "/muv/, no 'movi'", "es": "mover / mudarse"}, {"base": "need", "third": "needs", "past": "needed", "part": "needed", "ing": "needing", "ri": "R", "ed": "/id/", "nota": "2 sílabas: nee-ded", "es": "necesitar"}, {"base": "observe", "third": "observes", "past": "observed", "part": "observed", "ing": "observing", "ri": "R", "ed": "/d/", "nota": "", "es": "observar"}, {"base": "offer", "third": "offers", "past": "offered", "part": "offered", "ing": "offering", "ri": "R", "ed": "/d/", "nota": "", "es": "ofrecer"}, {"base": "open", "third": "opens", "past": "opened", "part": "opened", "ing": "opening", "ri": "R", "ed": "/d/", "nota": "", "es": "abrir"}, {"base": "order", "third": "orders", "past": "ordered", "part": "ordered", "ing": "ordering", "ri": "R", "ed": "/d/", "nota": "", "es": "pedir / ordenar"}, {"base": "organize", "third": "organizes", "past": "organized", "part": "organized", "ing": "organizing", "ri": "R", "ed": "/d/", "nota": "acento: /OR-ga-naiz/", "es": "organizar"}, {"base": "park", "third": "parks", "past": "parked", "part": "parked", "ing": "parking", "ri": "R", "ed": "/t/", "nota": "", "es": "estacionar"}, {"base": "participate", "third": "participates", "past": "participated", "part": "participated", "ing": "participating", "ri": "R", "ed": "/id/", "nota": "", "es": "participar"}, {"base": "pay", "third": "pays", "past": "paid", "part": "paid", "ing": "paying", "ri": "I", "ed": "", "nota": "paid /peid/", "es": "pagar"}, {"base": "pick up", "third": "picks up", "past": "picked up", "part": "picked up", "ing": "picking up", "ri": "R", "ed": "/t/", "nota": "", "es": "recoger"}, {"base": "plan", "third": "plans", "past": "planned", "part": "planned", "ing": "planning", "ri": "R", "ed": "/d/", "nota": "", "es": "planear"}, {"base": "play", "third": "plays", "past": "played", "part": "played", "ing": "playing", "ri": "R", "ed": "/d/", "nota": "", "es": "jugar / tocar"}, {"base": "practice", "third": "practices", "past": "practiced", "part": "practiced", "ing": "practicing", "ri": "R", "ed": "/t/", "nota": "", "es": "practicar"}, {"base": "prefer", "third": "prefers", "past": "preferred", "part": "preferred", "ing": "preferring", "ri": "R", "ed": "/d/", "nota": "doble r: preferred", "es": "preferir"}, {"base": "print", "third": "prints", "past": "printed", "part": "printed", "ing": "printing", "ri": "R", "ed": "/id/", "nota": "", "es": "imprimir"}, {"base": "provide", "third": "provides", "past": "provided", "part": "provided", "ing": "providing", "ri": "R", "ed": "/id/", "nota": "", "es": "proporcionar"}, {"base": "pull", "third": "pulls", "past": "pulled", "part": "pulled", "ing": "pulling", "ri": "R", "ed": "/d/", "nota": "u corta: /pul/", "es": "jalar"}, {"base": "push", "third": "pushes", "past": "pushed", "part": "pushed", "ing": "pushing", "ri": "R", "ed": "/t/", "nota": "u corta: /push/", "es": "empujar"}, {"base": "put", "third": "puts", "past": "put", "part": "put", "ing": "putting", "ri": "I", "ed": "", "nota": "las 3 iguales: /put/", "es": "poner"}, {"base": "put on", "third": "puts on", "past": "put on", "part": "put on", "ing": "putting on", "ri": "I", "ed": "", "nota": "", "es": "ponerse (ropa)"}, {"base": "rain", "third": "rains", "past": "rained", "part": "rained", "ing": "raining", "ri": "R", "ed": "/d/", "nota": "", "es": "llover"}, {"base": "read", "third": "reads", "past": "read", "part": "read", "ing": "reading", "ri": "I", "ed": "", "nota": "pasado se escribe igual: /red/", "es": "leer"}, {"base": "refer", "third": "refers", "past": "referred", "part": "referred", "ing": "referring", "ri": "R", "ed": "/d/", "nota": "", "es": "referir"}, {"base": "remember", "third": "remembers", "past": "remembered", "part": "remembered", "ing": "remembering", "ri": "R", "ed": "/d/", "nota": "", "es": "recordar"}, {"base": "repair", "third": "repairs", "past": "repaired", "part": "repaired", "ing": "repairing", "ri": "R", "ed": "/d/", "nota": "", "es": "reparar"}, {"base": "repeat", "third": "repeats", "past": "repeated", "part": "repeated", "ing": "repeating", "ri": "R", "ed": "/id/", "nota": "", "es": "repetir"}, {"base": "rest", "third": "rests", "past": "rested", "part": "rested", "ing": "resting", "ri": "R", "ed": "/id/", "nota": "", "es": "descansar"}, {"base": "return", "third": "returns", "past": "returned", "part": "returned", "ing": "returning", "ri": "R", "ed": "/d/", "nota": "", "es": "regresar"}, {"base": "ride", "third": "rides", "past": "rode", "part": "ridden", "ing": "riding", "ri": "I", "ed": "", "nota": "ridden: i corta /ríden/", "es": "montar / andar en"}, {"base": "rollerskate", "third": "rollerskates", "past": "rollerskated", "part": "rollerskated", "ing": "rollerskating", "ri": "R", "ed": "/id/", "nota": "", "es": "patinar"}, {"base": "run", "third": "runs", "past": "ran", "part": "run", "ing": "running", "ri": "I", "ed": "", "nota": "participio = base", "es": "correr"}, {"base": "save", "third": "saves", "past": "saved", "part": "saved", "ing": "saving", "ri": "R", "ed": "/d/", "nota": "", "es": "ahorrar / guardar"}, {"base": "say", "third": "says", "past": "said", "part": "said", "ing": "saying", "ri": "I", "ed": "", "nota": "says /ses/ - said /sed/", "es": "decir"}, {"base": "see", "third": "sees", "past": "saw", "part": "seen", "ing": "seeing", "ri": "I", "ed": "", "nota": "saw /so/ - seen /siin/", "es": "ver"}, {"base": "seem", "third": "seems", "past": "seemed", "part": "seemed", "ing": "seeming", "ri": "R", "ed": "/d/", "nota": "", "es": "parecer"}, {"base": "sell", "third": "sells", "past": "sold", "part": "sold", "ing": "selling", "ri": "I", "ed": "", "nota": "sold /sould/", "es": "vender"}, {"base": "send", "third": "sends", "past": "sent", "part": "sent", "ing": "sending", "ri": "I", "ed": "", "nota": "sent /sent/", "es": "enviar"}, {"base": "set", "third": "sets", "past": "set", "part": "set", "ing": "setting", "ri": "I", "ed": "", "nota": "las 3 formas iguales", "es": "poner / fijar"}, {"base": "sew", "third": "sews", "past": "sewed", "part": "sewn", "ing": "sewing", "ri": "I", "ed": "", "nota": "suena /sou/, como 'so'", "es": "coser"}, {"base": "shop", "third": "shops", "past": "shopped", "part": "shopped", "ing": "shopping", "ri": "R", "ed": "/t/", "nota": "", "es": "ir de compras"}, {"base": "show", "third": "shows", "past": "showed", "part": "shown", "ing": "showing", "ri": "I", "ed": "", "nota": "participio: shown", "es": "mostrar"}, {"base": "sign", "third": "signs", "past": "signed", "part": "signed", "ing": "signing", "ri": "R", "ed": "/d/", "nota": "g muda: /sain/", "es": "firmar"}, {"base": "sing", "third": "sings", "past": "sang", "part": "sung", "ing": "singing", "ri": "I", "ed": "", "nota": "sang /sang/ - sung /sang/", "es": "cantar"}, {"base": "sit", "third": "sits", "past": "sat", "part": "sat", "ing": "sitting", "ri": "I", "ed": "", "nota": "i corta /sit/, no 'siit'", "es": "sentarse"}, {"base": "sleep", "third": "sleeps", "past": "slept", "part": "slept", "ing": "sleeping", "ri": "I", "ed": "", "nota": "slept /slept/", "es": "dormir"}, {"base": "smell", "third": "smells", "past": "smelled", "part": "smelled", "ing": "smelling", "ri": "R", "ed": "/d/", "nota": "UK: smelt", "es": "oler"}, {"base": "smile", "third": "smiles", "past": "smiled", "part": "smiled", "ing": "smiling", "ri": "R", "ed": "/d/", "nota": "", "es": "sonreír"}, {"base": "snow", "third": "snows", "past": "snowed", "part": "snowed", "ing": "snowing", "ri": "R", "ed": "/d/", "nota": "", "es": "nevar"}, {"base": "speak", "third": "speaks", "past": "spoke", "part": "spoken", "ing": "speaking", "ri": "I", "ed": "", "nota": "spoke /spouk/", "es": "hablar"}, {"base": "spend", "third": "spends", "past": "spent", "part": "spent", "ing": "spending", "ri": "I", "ed": "", "nota": "", "es": "gastar"}, {"base": "spill", "third": "spills", "past": "spilled", "part": "spilled", "ing": "spilling", "ri": "R", "ed": "/d/", "nota": "UK: spilt", "es": "derramar"}, {"base": "spoil", "third": "spoils", "past": "spoiled", "part": "spoiled", "ing": "spoiling", "ri": "R", "ed": "/d/", "nota": "UK: spoilt", "es": "estropear"}, {"base": "stand", "third": "stands", "past": "stood", "part": "stood", "ing": "standing", "ri": "I", "ed": "", "nota": "stood /stud/", "es": "estar de pie"}, {"base": "start", "third": "starts", "past": "started", "part": "started", "ing": "starting", "ri": "R", "ed": "/id/", "nota": "", "es": "empezar"}, {"base": "stay", "third": "stays", "past": "stayed", "part": "stayed", "ing": "staying", "ri": "R", "ed": "/d/", "nota": "", "es": "permanecer"}, {"base": "stop", "third": "stops", "past": "stopped", "part": "stopped", "ing": "stopping", "ri": "R", "ed": "/t/", "nota": "", "es": "detener"}, {"base": "study", "third": "studies", "past": "studied", "part": "studied", "ing": "studying", "ri": "R", "ed": "/d/", "nota": "", "es": "estudiar"}, {"base": "sweep", "third": "sweeps", "past": "swept", "part": "swept", "ing": "sweeping", "ri": "I", "ed": "", "nota": "swept /suept/", "es": "barrer"}, {"base": "swim", "third": "swims", "past": "swam", "part": "swum", "ing": "swimming", "ri": "I", "ed": "", "nota": "ojo: swam vs swum", "es": "nadar"}, {"base": "take", "third": "takes", "past": "took", "part": "taken", "ing": "taking", "ri": "I", "ed": "", "nota": "took: u corta /tuk/", "es": "tomar"}, {"base": "take off", "third": "takes off", "past": "took off", "part": "taken off", "ing": "taking off", "ri": "I", "ed": "", "nota": "", "es": "quitarse (ropa)"}, {"base": "talk", "third": "talks", "past": "talked", "part": "talked", "ing": "talking", "ri": "R", "ed": "/t/", "nota": "l muda: /tok/", "es": "hablar"}, {"base": "teach", "third": "teaches", "past": "taught", "part": "taught", "ing": "teaching", "ri": "I", "ed": "", "nota": "gh muda: /tot/", "es": "enseñar"}, {"base": "tell", "third": "tells", "past": "told", "part": "told", "ing": "telling", "ri": "I", "ed": "", "nota": "told /tould/", "es": "decir / contar"}, {"base": "think", "third": "thinks", "past": "thought", "part": "thought", "ing": "thinking", "ri": "I", "ed": "", "nota": "gh muda: /thot/", "es": "pensar"}, {"base": "throw", "third": "throws", "past": "threw", "part": "thrown", "ing": "throwing", "ri": "I", "ed": "", "nota": "threw /thru/", "es": "tirar / lanzar"}, {"base": "tie", "third": "ties", "past": "tied", "part": "tied", "ing": "tying", "ri": "R", "ed": "/d/", "nota": "-ing: tying", "es": "amarrar"}, {"base": "travel", "third": "travels", "past": "traveled", "part": "traveled", "ing": "traveling", "ri": "R", "ed": "/d/", "nota": "", "es": "viajar"}, {"base": "try", "third": "tries", "past": "tried", "part": "tried", "ing": "trying", "ri": "R", "ed": "/d/", "nota": "", "es": "intentar"}, {"base": "turn", "third": "turns", "past": "turned", "part": "turned", "ing": "turning", "ri": "R", "ed": "/d/", "nota": "", "es": "girar"}, {"base": "turn off", "third": "turns off", "past": "turned off", "part": "turned off", "ing": "turning off", "ri": "R", "ed": "/d/", "nota": "", "es": "apagar"}, {"base": "turn on", "third": "turns on", "past": "turned on", "part": "turned on", "ing": "turning on", "ri": "R", "ed": "/d/", "nota": "", "es": "prender"}, {"base": "understand", "third": "understands", "past": "understood", "part": "understood", "ing": "understanding", "ri": "I", "ed": "", "nota": "/an-der-stud/", "es": "entender"}, {"base": "use", "third": "uses", "past": "used", "part": "used", "ing": "using", "ri": "R", "ed": "/d/", "nota": "/iuz/ - used /iuzd/", "es": "usar"}, {"base": "visit", "third": "visits", "past": "visited", "part": "visited", "ing": "visiting", "ri": "R", "ed": "/id/", "nota": "", "es": "visitar"}, {"base": "wait", "third": "waits", "past": "waited", "part": "waited", "ing": "waiting", "ri": "R", "ed": "/id/", "nota": "", "es": "esperar"}, {"base": "wake up", "third": "wakes up", "past": "woke up", "part": "woken up", "ing": "waking up", "ri": "I", "ed": "", "nota": "woke /wouk/", "es": "despertar"}, {"base": "walk", "third": "walks", "past": "walked", "part": "walked", "ing": "walking", "ri": "R", "ed": "/t/", "nota": "l muda: /wok/", "es": "caminar"}, {"base": "want", "third": "wants", "past": "wanted", "part": "wanted", "ing": "wanting", "ri": "R", "ed": "/id/", "nota": "/want/, no 'guant'", "es": "querer"}, {"base": "wash", "third": "washes", "past": "washed", "part": "washed", "ing": "washing", "ri": "R", "ed": "/t/", "nota": "", "es": "lavar"}, {"base": "watch", "third": "watches", "past": "watched", "part": "watched", "ing": "watching", "ri": "R", "ed": "/t/", "nota": "/uach/", "es": "mirar"}, {"base": "wear", "third": "wears", "past": "wore", "part": "worn", "ing": "wearing", "ri": "I", "ed": "", "nota": "/uer/, no 'uier'", "es": "usar / vestir"}, {"base": "win", "third": "wins", "past": "won", "part": "won", "ing": "winning", "ri": "I", "ed": "", "nota": "won suena /uan/", "es": "ganar"}, {"base": "work", "third": "works", "past": "worked", "part": "worked", "ing": "working", "ri": "R", "ed": "/t/", "nota": "/uerk/", "es": "trabajar"}, {"base": "write", "third": "writes", "past": "wrote", "part": "written", "ing": "writing", "ri": "I", "ed": "", "nota": "w muda: /rait/ - /rout/", "es": "escribir"}];
+
+/* ---------- guardado ---------- */
+const KEY = 'verbosIQ.v1';
+let memoria = null;
+function cargar(){
+  try{ const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : {}; }
+  catch(e){ document.getElementById('warn').textContent = 'sin guardado en este entorno'; memoria = memoria || {}; return memoria; }
+}
+function guardar(obj){
+  try{ localStorage.setItem(KEY, JSON.stringify(obj)); }
+  catch(e){ memoria = obj; }
+}
+let prog = cargar();
+
+/* ---------- voz ---------- */
+const SKEY = 'verbosIQ.sonido';
+let sonido = true;
+try{ sonido = localStorage.getItem(SKEY) !== '0'; }catch(e){}
+
+let voces = [];
+function cargarVoces(){
+  try{ voces = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); }catch(e){}
+}
+if('speechSynthesis' in window){
+  cargarVoces();
+  speechSynthesis.onvoiceschanged = cargarVoces;
+}
+
+function hablar(txt, forzar){
+  if((!sonido && !forzar) || !('speechSynthesis' in window) || !txt || txt === '--') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(String(txt).replace(/\s*\/\s*/g, ' or '));
+  const v = voces.find(x => /en[-_]US/i.test(x.lang) && /google|natural|samantha|aria|zira|ava/i.test(x.name))
+         || voces.find(x => /en[-_]US/i.test(x.lang)) || voces[0];
+  if(v) u.voice = v;
+  u.lang = 'en-US'; u.rate = 0.82;
+  speechSynthesis.speak(u);
+}
+
+function pintarSonido(){
+  const b = document.getElementById('snd');
+  b.classList.toggle('off', !sonido);
+  b.querySelector('b').textContent = sonido ? 'on' : 'off';
+  document.getElementById('spk').style.opacity = sonido ? 1 : .45;
+}
+document.getElementById('snd').onclick = () => {
+  sonido = !sonido;
+  try{ localStorage.setItem(SKEY, sonido ? '1' : '0'); }catch(e){}
+  if(!sonido && 'speechSynthesis' in window) speechSynthesis.cancel();
+  pintarSonido();
+};
+
+/* ---------- utilidades ---------- */
+const norm = s => s.toLowerCase().trim().replace(/[.!?]/g,'').replace(/\s+/g,' ');
+
+const porEspanol = {};
+VERBOS.forEach(v => {
+  const k = norm(v.es);
+  (porEspanol[k] = porEspanol[k] || []).push(v.base);
+});
+
+const TIPOS = {
+  past:  {campo:'past',  ask:'¿Cuál es el <s>past form</s>?'},
+  part:  {campo:'part',  ask:'¿Cuál es el <s>past participle</s>?'},
+  ing:   {campo:'ing',   ask:'¿Cuál es la forma <s>-ing</s>?'},
+  third: {campo:'third', ask:'¿Cuál es la forma de <s>he / she / it</s>?'},
+  ri:    {campo:'ri',    ask:'¿Es <s>regular o irregular</s>?'},
+  ed:    {campo:'ed',    ask:'¿Cómo suena el <s>-ed</s>?'},
+  es:    {campo:'base',  ask:'¿Cuál es el <s>verbo en inglés</s>?'}
+};
+
+function tiposDe(v){
+  const t = [];
+  ['past','part','ing','third'].forEach(k => { if(v[k] && v[k] !== '--') t.push(k); });
+  t.push('ri','es');
+  if(v.ed) t.push('ed');
+  return t;
+}
+
+const PESO = [9,6,4,3,2,1];
+function caja(base){ return (prog[base] && prog[base].box) || 0; }
+
+let anterior = null;
+function elegir(){
+  const pool = [];
+  VERBOS.forEach(v => {
+    if(VERBOS.length > 1 && v.base === anterior) return;
+    const p = PESO[caja(v.base)];
+    for(let i=0;i<p;i++) pool.push(v);
+  });
+  const v = pool[Math.floor(Math.random()*pool.length)];
+  anterior = v.base;
+  const t = tiposDe(v);
+  return {v, tipo: t[Math.floor(Math.random()*t.length)]};
+}
+
+/* ---------- estado ---------- */
+let actual = null, sTot = 0, sOk = 0, streak = 0;
+
+function aceptadas(v, tipo){
+  const val = v[TIPOS[tipo].campo];
+  const set = new Set([norm(val)]);
+  val.split('/').forEach(p => { if(p.trim()) set.add(norm(p)); });
+  if(tipo === 'es'){ (porEspanol[norm(v.es)]||[]).forEach(b => set.add(norm(b))); }
+  return set;
+}
+
+function pintar(){
+  const {v, tipo} = actual;
+  document.getElementById('ask').innerHTML = TIPOS[tipo].ask;
+  document.getElementById('word').textContent = tipo === 'es' ? v.es : v.base;
+  document.getElementById('es').textContent   = tipo === 'es' ? '' : v.es;
+
+  const badge = document.getElementById('badge');
+  if(tipo === 'ri' || tipo === 'es'){ badge.style.display='none'; }
+  else { badge.style.display=''; badge.className = 'badge ' + v.ri;
+         badge.textContent = v.ri === 'I' ? 'IRREGULAR' : 'REGULAR'; }
+
+  const spk = document.getElementById('spk');
+  spk.style.display = (tipo === 'es') ? 'none' : '';
+  spk.onclick = () => hablar(v.base, true);
+
+  const area = document.getElementById('answerArea');
+  area.innerHTML = '';
+  if(tipo === 'ri'){
+    area.innerHTML = '<div class="choices">' +
+      '<button class="opt" data-v="R">Regular</button>' +
+      '<button class="opt" data-v="I">Irregular</button></div>';
+    area.querySelectorAll('.opt').forEach(b => b.onclick = () => revisar(b.dataset.v));
+  } else if(tipo === 'ed'){
+    area.innerHTML = '<div class="choices">' +
+      ['/t/','/d/','/id/'].map(o => '<button class="opt" data-v="'+o+'">'+o+'</button>').join('') +
+      '</div>';
+    area.querySelectorAll('.opt').forEach(b => b.onclick = () => revisar(b.dataset.v));
+  } else {
+    area.innerHTML = '<input type="text" id="inp" autocomplete="off" autocapitalize="off" ' +
+      'autocorrect="off" spellcheck="false" placeholder="escribe tu respuesta">' +
+      '<button class="go" id="check">Revisar</button>';
+    const inp = document.getElementById('inp');
+    inp.focus();
+    inp.onkeydown = e => { if(e.key === 'Enter') revisar(inp.value); };
+    document.getElementById('check').onclick = () => revisar(inp.value);
+  }
+
+  document.getElementById('row').classList.remove('show');
+  document.getElementById('note').style.display = 'none';
+  refrescar();
+}
+
+function revisar(entrada){
+  const {v, tipo} = actual;
+  const bien = aceptadas(v, tipo).has(norm(String(entrada)));
+
+  const p = prog[v.base] || {box:0, ok:0, mal:0};
+  if(bien){ p.box = Math.min(5, p.box + 1); p.ok++; sOk++; streak++; }
+  else    { p.box = 1; p.mal++; streak = 0; }
+  prog[v.base] = p; sTot++;
+  guardar(prog);
+
+  const campo = TIPOS[tipo].campo;
+  const cols = [['base','base'],['3ª pers.','third'],['pasado','past'],['participio','part'],['-ing','ing']];
+  const grid = document.getElementById('grid');
+  grid.innerHTML = cols.map(([et,k]) => {
+    const esObjetivo = (k === campo && tipo !== 'es' && tipo !== 'ri' && tipo !== 'ed');
+    const cls = 'cell' + (esObjetivo ? ' target' + (bien ? '' : ' bad') : '');
+    return '<div class="'+cls+'" data-say="'+v[k]+'"><span>'+et+'</span><b>'+v[k]+'</b></div>';
+  }).join('');
+  grid.querySelectorAll('.cell').forEach(c => c.onclick = () => hablar(c.dataset.say, true));
+
+  let txt;
+  if(bien){
+    txt = '<span class="ok">Correcto.</span>';
+    if(tipo === 'ri') txt += ' ' + (v.ri==='I' ? 'Irregular — hay que memorizarlo.' : 'Regular — se le agrega -ed.');
+    if(tipo === 'ed') txt += ' <span class="fix">' + v.base + 'ed</span> suena <span class="fix">' + v.ed + '</span>.';
+  } else {
+    const correcto = tipo === 'ri' ? (v.ri === 'I' ? 'Irregular' : 'Regular') : v[campo];
+    txt = '<span class="no">No.</span> Era <span class="fix">' + correcto + '</span>.';
+    if(tipo === 'es') txt += ' Escribiste otra cosa — este verbo lo vuelves a ver pronto.';
+  }
+  if(v.ri === 'R' && v.ed && tipo !== 'ed') txt += ' El <span class="fix">-ed</span> suena <span class="fix">' + v.ed + '</span>.';
+  document.getElementById('verdict').innerHTML = txt;
+
+  if(v.nota){
+    const n = document.getElementById('note');
+    n.textContent = '⚠ ' + v.nota;
+    n.style.display = '';
+  }
+
+  document.getElementById('row').classList.add('show');
+  hablar(tipo === 'ri' ? v.base : tipo === 'ed' ? v.past : v[campo]);
+  document.getElementById('next').focus();
+  refrescar();
+}
+
+function refrescar(){
+  document.getElementById('s-tot').textContent = sTot;
+  document.getElementById('s-ok').textContent  = sOk;
+  document.getElementById('s-streak').textContent = streak;
+  const dom = VERBOS.filter(v => caja(v.base) >= 5).length;
+  document.getElementById('s-dom').textContent = dom;
+  const vistos = Object.keys(prog).length;
+  document.getElementById('meta').innerHTML = vistos + ' / ' + VERBOS.length + ' vistos<br>' +
+    (sTot ? Math.round(sOk/sTot*100) + '% en esta sesión' : 'empieza cuando quieras');
+  document.getElementById('tiles').innerHTML =
+    VERBOS.map(v => '<div class="t b'+caja(v.base)+'" title="'+v.base+'"></div>').join('');
+}
+
+document.getElementById('next').onclick = () => { actual = elegir(); pintar(); };
+document.getElementById('reset').onclick = () => {
+  if(!confirm('¿Borrar todo tu progreso guardado?')) return;
+  prog = {}; guardar(prog); sTot = sOk = streak = 0; actual = elegir(); pintar();
+};
+document.addEventListener('keydown', e => {
+  if((e.key === 's' || e.key === 'S') && e.target.tagName !== 'INPUT'){
+    e.preventDefault(); hablar(actual.v.base, true); return;
+  }
+  if(e.key === 'Enter' && document.getElementById('row').classList.contains('show')){
+    e.preventDefault(); actual = elegir(); pintar();
+  }
+});
+
+pintarSonido();
+actual = elegir();
+pintar();
+</script>
+</body>
+</html>
